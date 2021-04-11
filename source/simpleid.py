@@ -10,7 +10,7 @@ class SimpleId(object):
     """Value object that represent a 64bits integer id."""
 
     _pid = None
-    _inc = randint(0, 1000)
+    _inc = randint(0, 100000)
     _inc_lock = Lock()
 
     __random = None
@@ -28,26 +28,17 @@ class SimpleId(object):
         return cls.__random
 
     def _generate(self):
-        # Timestamp
-        output = int(time() * 1000)
+        timestamp = int(time() * 10)
 
-        # Space for process random id
-        output *= 1000
-
-        # Process random id
-        output += SimpleId._random()
-
-        # Space for increment
-        output *= 1000
+        process = SimpleId._random()
 
         with SimpleId._inc_lock:
-            # Increment
-            output += SimpleId._inc
+            increment = SimpleId._inc
 
             # Increment counter
-            SimpleId._inc = (SimpleId._inc + 1) % 1000
+            SimpleId._inc = (SimpleId._inc + 1) % 100000
 
-        return output
+        return (timestamp * 100000000) + (process * 100000) + (increment)
     
     @property
     def value(self):
