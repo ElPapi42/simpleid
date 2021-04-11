@@ -22,10 +22,10 @@ class SimpleId(object):
     __logical_node_id:Optional[int] = None
 
     def __init__(self, value:Union[str, int, None]=None):
-        self._value:int = self.generate()
-    
+        self._value:int = self._generate()
+
     @classmethod
-    def get_logical_node(cls):
+    def _get_logical_node(cls):
         """
         Random id for machine-process pairs.
 
@@ -45,11 +45,11 @@ class SimpleId(object):
         return cls.__logical_node_id
     
     @classmethod
-    def get_counter(cls):
+    def _get_counter(cls):
         """Increment ans return the internal counter."""
         # Init counter if requried
         if cls.__counter is None:
-            cls.__counter = cls.get_logical_node() % cls._max_counter
+            cls.__counter = cls._get_logical_node() % cls._max_counter
 
         # Increment the counter
         with cls.__counter_lock:
@@ -58,7 +58,7 @@ class SimpleId(object):
 
         return counter
     
-    def merge(self, timestamp, node, counter):
+    def _merge(self, timestamp, node, counter):
         """Merge the inputs into the final sid value."""
         # Creates enought space for the node
         # and counter to be added without
@@ -71,16 +71,16 @@ class SimpleId(object):
 
         return ftimestamp + fnode + counter
 
-    def generate(self):
+    def _generate(self):
         timestamp = int(time() * SimpleId._timestamp_precision)
 
-        node = SimpleId.get_logical_node()
+        node = SimpleId._get_logical_node()
 
-        counter = SimpleId.get_counter()
-        
+        counter = SimpleId._get_counter()
+
         print(timestamp, node, counter)
 
-        return self.merge(timestamp, node, counter)
+        return self._merge(timestamp, node, counter)
 
     def __repr__(self):
         return f'SimpleId({str(self._value)})'
