@@ -41,6 +41,7 @@ def test_collision_0():
 
     assert len(sids) == len(sids_no_dupl)
 
+@pytest.mark.slow
 def test_collision_multi_0():
     """
     This test ensures sids work with 
@@ -79,3 +80,9 @@ def test_collision_multi_0():
     #print([proc.pid for proc in procs])
 
     assert len(sids) == len(sids_no_dupl)
+
+def test_max_size_is_64():
+    sid = SimpleId()
+    sid = str(sid)
+
+    assert len(sid) == 19

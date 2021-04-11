@@ -11,6 +11,9 @@ from random import Random, randint
 
 class SimpleId(object):
     """Value object that represent a 64bits integer id."""
+    _timestamp_precision:int = 100 # 1=second, 10=milisecond, 100=microsecond
+    _max_counter:int = 10000
+    _max_node_id:int = 1000
 
     __counter:Optional[int] = None
     __counter_lock = Lock()
@@ -37,7 +40,7 @@ class SimpleId(object):
             cls.__logical_node = logical_node
 
             # Logical node id using the int representation as base
-            cls.__logical_node_id = logical_node % 100000
+            cls.__logical_node_id = logical_node % cls._max_node_id
 
         return cls.__logical_node_id
     
@@ -46,25 +49,38 @@ class SimpleId(object):
         """Increment ans return the internal counter."""
         # Init counter if requried
         if cls.__counter is None:
-            cls.__counter = cls.get_logical_node() % 10000
+            cls.__counter = cls.get_logical_node() % cls._max_counter
 
         # Increment the counter
         with cls.__counter_lock:
-            counter = (cls.__counter + 1) % 10000
+            counter = (cls.__counter + 1) % cls._max_counter
             cls.__counter = counter
 
         return counter
+    
+    def merge(self, timestamp, node, counter):
+        """Merge the inputs into the final sid value."""
+        # Creates enought space for the node
+        # and counter to be added without
+        # intersecting with timestamp digits
+        ftimestamp = timestamp * SimpleId._max_node_id * SimpleId._max_counter
+
+        # Creates enougth space for the counter
+        # to be added safely to the node value
+        fnode = node * SimpleId._max_counter
+
+        return ftimestamp + fnode + counter
 
     def generate(self):
-        timestamp = int(time())
+        timestamp = int(time() * SimpleId._timestamp_precision)
 
-        process = SimpleId.get_logical_node()
+        node = SimpleId.get_logical_node()
 
         counter = SimpleId.get_counter()
         
-        #print(timestamp, process, counter)
+        print(timestamp, node, counter)
 
-        return (timestamp * 1000000000) + (process * 10000) + (counter)
+        return self.merge(timestamp, node, counter)
 
     def __repr__(self):
         return f'SimpleId({str(self._value)})'
