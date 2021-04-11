@@ -11,8 +11,7 @@ from random import Random, randint
 class SimpleId(object):
     """Value object that represent a 64bits integer id."""
 
-    _pid = None
-    _inc = randint(0, 100000)
+    _inc = randint(0, 9999)
     _inc_lock = Lock()
 
     __logical_node_name:str = ''
@@ -30,20 +29,20 @@ class SimpleId(object):
         also know as logical node.
         """
         # Get string representation of logical node
-        logical_node_name = f'{getnode()}:{getpid()}'
+        logical_node_name = f'{getnode()}{getpid()}'
 
         # New logical node id if its name was not set
         if logical_node_name != cls.__logical_node_name:
             cls.__logical_node_name = logical_node_name
 
-            # New random logical node id using the name as seed
-            rand = Random(x=logical_node_name)
-            cls.__logical_node_id = rand.randint(0, 1000)
+            # Logical node id using the name as base
+            #rand = Random(x=logical_node_name).randint(0, 99999)
+            cls.__logical_node_id = int(logical_node_name) % 100000
 
         return cls.__logical_node_id
 
     def generate(self):
-        timestamp = int(time() * 10)
+        timestamp = int(time())
 
         process = SimpleId.get_logical_node()
 
@@ -51,11 +50,11 @@ class SimpleId(object):
             increment = SimpleId._inc
 
             # Increment counter
-            SimpleId._inc = (SimpleId._inc + 1) % 100000
+            SimpleId._inc = (SimpleId._inc + 1) % 10000
         
         #print(timestamp, process, increment)
 
-        return (timestamp * 100000000) + (process * 100000) + (increment)
+        return (timestamp * 1000000000) + (process * 10000) + (increment)
     
     @property
     def value(self):
