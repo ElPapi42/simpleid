@@ -49,12 +49,19 @@ class SimpleId(object):
         """Increment ans return the internal counter."""
         # Init counter if requried
         if cls.__counter is None:
-            cls.__counter = cls._get_logical_node() % cls._max_counter
+            rng = Random()
+
+            base = cls._get_logical_node() % cls._max_counter
+            limit = cls._max_counter - base
+            shift = rng.randint(0, limit)
+
+            with cls.__counter_lock:
+                cls.__counter = base + shift
 
         # Increment the counter
         with cls.__counter_lock:
-            counter = (cls.__counter + 1) % cls._max_counter
-            cls.__counter = counter
+            counter = cls.__counter
+            cls.__counter = (cls.__counter + 1) % cls._max_counter
 
         return counter
     

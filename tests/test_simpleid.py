@@ -26,13 +26,13 @@ def generate_sids_process(n, q):
 
     q.put(sids)
 
-def test_collision_0():
+def test_collision_single_0():
     """
     This test ensures sids work with
     100% reliability on a single logical
     node environment.
     """
-    qty = 10000
+    qty = 1000000
 
     # Generate list of ids
     sids = sids_factory(qty)
@@ -49,7 +49,7 @@ def test_collision_multi_0():
     environment of multiple logical nodes.
     """
     logical_nodes = 1000
-    sids_per_node = 10000
+    sids_per_node = 100000
 
     queue = Queue()
 
@@ -76,8 +76,6 @@ def test_collision_multi_0():
 
     # Get unique sids
     sids_no_dupl = list(dict.fromkeys(sids))
-
-    #print([proc.pid for proc in procs])
 
     assert len(sids) == len(sids_no_dupl)
 
