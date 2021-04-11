@@ -1,3 +1,4 @@
+from typing import Optional
 from time import time, time_ns
 from os import getpid, urandom
 from secrets import randbits
@@ -14,8 +15,8 @@ class SimpleId(object):
     _inc = randint(0, 9999)
     _inc_lock = Lock()
 
-    __logical_node_name:str = ''
-    __logical_node_id:int
+    __logical_node:Optional[int] = None
+    __logical_node_id:Optional[int] = None
 
     def __init__(self, value:Union[str, int, None]=None):
         self._value:int = self.generate()
@@ -28,16 +29,15 @@ class SimpleId(object):
         A machine-process pair is
         also know as logical node.
         """
-        # Get string representation of logical node
-        logical_node_name = f'{getnode()}{getpid()}'
+        # Get full integer representing logical node
+        logical_node = int(f'{getnode()}{getpid()}')
 
-        # New logical node id if its name was not set
-        if logical_node_name != cls.__logical_node_name:
-            cls.__logical_node_name = logical_node_name
+        # New id if logical node not defined
+        if logical_node != cls.__logical_node:
+            cls.__logical_node = logical_node
 
-            # Logical node id using the name as base
-            #rand = Random(x=logical_node_name).randint(0, 99999)
-            cls.__logical_node_id = int(logical_node_name) % 100000
+            # Logical node id using the int representation as base
+            cls.__logical_node_id = logical_node % 100000
 
         return cls.__logical_node_id
 
