@@ -78,7 +78,7 @@ class SimpleId(object):
 
         counter = SimpleId._get_counter()
 
-        print(timestamp, node, counter)
+        #print(timestamp, node, counter)
 
         return self._merge(timestamp, node, counter)
 
