@@ -12,8 +12,8 @@ from random import Random, randint
 class SimpleId(object):
     """Value object that represent a 64bits integer id."""
 
-    _inc = randint(0, 9999)
-    _inc_lock = Lock()
+    __counter:Optional[int] = None
+    __counter_lock = Lock()
 
     __logical_node:Optional[int] = None
     __logical_node_id:Optional[int] = None
@@ -40,25 +40,31 @@ class SimpleId(object):
             cls.__logical_node_id = logical_node % 100000
 
         return cls.__logical_node_id
+    
+    @classmethod
+    def get_counter(cls):
+        """Increment ans return the internal counter."""
+        # Init counter if requried
+        if cls.__counter is None:
+            cls.__counter = cls.get_logical_node() % 10000
+
+        # Increment the counter
+        with cls.__counter_lock:
+            counter = (cls.__counter + 1) % 10000
+            cls.__counter = counter
+
+        return counter
 
     def generate(self):
         timestamp = int(time())
 
         process = SimpleId.get_logical_node()
 
-        with SimpleId._inc_lock:
-            increment = SimpleId._inc
-
-            # Increment counter
-            SimpleId._inc = (SimpleId._inc + 1) % 10000
+        counter = SimpleId.get_counter()
         
-        #print(timestamp, process, increment)
+        #print(timestamp, process, counter)
 
-        return (timestamp * 1000000000) + (process * 10000) + (increment)
-    
-    @property
-    def value(self):
-        return self._value
+        return (timestamp * 1000000000) + (process * 10000) + (counter)
 
     def __repr__(self):
         return f'SimpleId({str(self._value)})'
