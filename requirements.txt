@@ -1,3 +1,4 @@
+bitarray
 pytest
 pytest-parallel
 pytest-randomly

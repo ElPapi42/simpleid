@@ -130,3 +130,5 @@ dmypy.json
 /.vscode
 /multitest.py
 /simpletest.py
+/bytestest.py
+/bitstest.py

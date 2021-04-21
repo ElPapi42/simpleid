@@ -32,7 +32,7 @@ def test_collision_single_0():
     100% reliability on a single logical
     node environment.
     """
-    qty = 1000000
+    qty = 100000
 
     # Generate list of ids
     sids = sids_factory(qty)
@@ -49,7 +49,7 @@ def test_collision_multi_0():
     environment of multiple logical nodes.
     """
     logical_nodes = 1000
-    sids_per_node = 100000
+    sids_per_node = 10000
 
     queue = Queue()
 
@@ -79,8 +79,8 @@ def test_collision_multi_0():
 
     assert len(sids) == len(sids_no_dupl)
 
-def test_max_size_is_64():
-    sid = SimpleId()
-    sid = str(sid)
-
-    assert len(sid) == 19
+#def test_max_size_is_64():
+#    sid = SimpleId()
+#    sid = str(sid)
+#
+#    assert len(sid) == 19
